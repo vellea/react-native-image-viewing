@@ -6,11 +6,11 @@
  *
  */
 
-import { useEffect, useState } from "react";
-import { Image, ImageURISource } from "react-native";
+import { useEffect, useState } from 'react';
+import { Image, ImageURISource } from 'react-native';
 
-import { createCache } from "../utils";
-import { Dimensions, ImageSource } from "../@types";
+import { createCache } from '../utils';
+import { Dimensions, ImageSource } from '../@types';
 
 const CACHE_SIZE = 50;
 const imageDimensionsCache = createCache(CACHE_SIZE);
@@ -20,7 +20,7 @@ const useImageDimensions = (image: ImageSource): Dimensions | null => {
 
   const getImageDimensions = (image: ImageSource): Promise<Dimensions> => {
     return new Promise((resolve) => {
-      if (typeof image == "number") {
+      if (typeof image == 'number') {
         const cacheKey = `${image}`;
         let imageDimensions = imageDimensionsCache.get(cacheKey);
 
@@ -46,10 +46,9 @@ const useImageDimensions = (image: ImageSource): Dimensions | null => {
         if (imageDimensions) {
           resolve(imageDimensions);
         } else {
-          // @ts-ignore
           Image.getSizeWithHeaders(
-            source.uri,
-            source.headers,
+            source.uri!,
+            source.headers!,
             (width: number, height: number) => {
               imageDimensionsCache.set(cacheKey, { width, height });
               resolve({ width, height });
