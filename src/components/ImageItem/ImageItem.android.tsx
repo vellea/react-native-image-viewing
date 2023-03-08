@@ -6,23 +6,22 @@
  *
  */
 
+import { Image, ImageLoadEventData, ImageProps } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
-
 import {
   Animated,
-  ScrollView,
   Dimensions,
-  StyleSheet,
+  NativeMethodsMixin,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  NativeMethodsMixin,
+  ScrollView,
+  StyleSheet,
 } from 'react-native';
 
+import { ImageSource } from '../../@types';
 import useImageDimensions from '../../hooks/useImageDimensions';
 import usePanResponder from '../../hooks/usePanResponder';
-
 import { getImageStyles, getImageTransform } from '../../utils';
-import { ImageSource } from '../../@types';
 import { ImageLoading } from './ImageLoading';
 
 const SWIPE_CLOSE_OFFSET = 75;
@@ -41,7 +40,10 @@ type Props = {
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
   doubleTapDelay: number;
+  imageProps?: ImageProps;
 };
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 const ImageItem = ({
   imageSrc,
@@ -53,14 +55,26 @@ const ImageItem = ({
   swipeToCloseEnabled = true,
   doubleTapToZoomEnabled = true,
   doubleTapDelay,
+  imageProps,
 }: Props) => {
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
-  const imageDimensions = useImageDimensions(imageSrc);
-  const [translate, scale] = getImageTransform(imageDimensions, SCREEN);
-  const scrollValueY = new Animated.Value(0);
+
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const [isLoaded, setLoadEnd] = useState(false);
 
-  const onLoaded = useCallback(() => setLoadEnd(true), []);
+  const imageDimensions = useImageDimensions(imageSrc);
+  const [translate, scale] = getImageTransform(size, SCREEN);
+  const scrollValueY = new Animated.Value(0);
+
+  const onLoaded = useCallback((e: ImageLoadEventData) => {
+    setSize({
+      width: e.source.width,
+      height: e.source.height,
+    });
+
+    setLoadEnd(true);
+  }, []);
+
   const onZoomPerformed = useCallback(
     (isZoomed: boolean) => {
       onZoom(isZoomed);
@@ -92,11 +106,7 @@ const ImageItem = ({
     doubleTapDelay,
   });
 
-  const imagesStyles = getImageStyles(
-    imageDimensions,
-    translateValue,
-    scaleValue
-  );
+  const imagesStyles = getImageStyles(size, translateValue, scaleValue);
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
     outputRange: [0.7, 1, 0.7],
@@ -141,11 +151,12 @@ const ImageItem = ({
         onScrollEndDrag,
       })}
     >
-      <Animated.Image
+      <AnimatedImage
+        {...imageProps}
         {...panHandlers}
         source={imageSrc}
-        style={imageStylesWithOpacity}
         onLoad={onLoaded}
+        style={imageStylesWithOpacity}
       />
       {(!isLoaded || !imageDimensions) && <ImageLoading />}
     </ScrollView>
