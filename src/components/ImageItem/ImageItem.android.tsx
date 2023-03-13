@@ -6,7 +6,7 @@
  *
  */
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from 'react';
 
 import {
   Animated,
@@ -16,18 +16,18 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   NativeMethodsMixin,
-} from "react-native";
+} from 'react-native';
 
-import useImageDimensions from "../../hooks/useImageDimensions";
-import usePanResponder from "../../hooks/usePanResponder";
+import useImageDimensions from '../../hooks/useImageDimensions';
+import usePanResponder from '../../hooks/usePanResponder';
 
-import { getImageStyles, getImageTransform } from "../../utils";
-import { ImageSource } from "../../@types";
-import { ImageLoading } from "./ImageLoading";
+import { getImageStyles, getImageTransform } from '../../utils';
+import { ImageSource } from '../../@types';
+import { ImageLoading } from './ImageLoading';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
-const SCREEN = Dimensions.get("window");
+const SCREEN = Dimensions.get('window');
 const SCREEN_WIDTH = SCREEN.width;
 const SCREEN_HEIGHT = SCREEN.height;
 
@@ -35,20 +35,24 @@ type Props = {
   imageSrc: ImageSource;
   onRequestClose: () => void;
   onZoom: (isZoomed: boolean) => void;
+  onPress: (image: ImageSource) => void;
   onLongPress: (image: ImageSource) => void;
   delayLongPress: number;
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
+  doubleTapDelay: number;
 };
 
 const ImageItem = ({
   imageSrc,
   onZoom,
   onRequestClose,
+  onPress,
   onLongPress,
   delayLongPress,
   swipeToCloseEnabled = true,
   doubleTapToZoomEnabled = true,
+  doubleTapDelay,
 }: Props) => {
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
   const imageDimensions = useImageDimensions(imageSrc);
@@ -73,6 +77,10 @@ const ImageItem = ({
     onLongPress(imageSrc);
   }, [imageSrc, onLongPress]);
 
+  const onPressHandler = useCallback(() => {
+    onPress(imageSrc);
+  }, [imageSrc, onPress]);
+
   const [panHandlers, scaleValue, translateValue] = usePanResponder({
     initialScale: scale || 1,
     initialTranslate: translate || { x: 0, y: 0 },
@@ -80,6 +88,8 @@ const ImageItem = ({
     doubleTapToZoomEnabled,
     onLongPress: onLongPressHandler,
     delayLongPress,
+    onPress: onPressHandler,
+    doubleTapDelay,
   });
 
   const imagesStyles = getImageStyles(

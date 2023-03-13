@@ -6,27 +6,31 @@
  *
  */
 
-import React from "react";
-import { GestureResponderEvent } from "react-native";
-import { ImageSource } from "../../@types";
+import React from 'react';
+import { GestureResponderEvent } from 'react-native';
+import { ImageSource } from '../../@types';
 
 declare type Props = {
   imageSrc: ImageSource;
   onRequestClose: () => void;
   onZoom: (isZoomed: boolean) => void;
+  onPress: (image: ImageSource) => void;
   onLongPress: (image: ImageSource) => void;
   delayLongPress: number;
   swipeToCloseEnabled?: boolean;
   doubleTapToZoomEnabled?: boolean;
+  doubleTapDelay: number;
 };
 
-declare const _default: React.MemoExoticComponent<({
-  imageSrc,
-  onZoom,
-  onRequestClose,
-  onLongPress,
-  delayLongPress,
-  swipeToCloseEnabled,
-}: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<
+  ({
+    imageSrc,
+    onZoom,
+    onRequestClose,
+    onLongPress,
+    delayLongPress,
+    swipeToCloseEnabled,
+  }: Props) => JSX.Element
+>;
 
 export default _default;

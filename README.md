@@ -77,6 +77,11 @@ const [visible, setIsVisible] = useState(false);
 | `doubleTapToZoomEnabled` | Zoom image by double tap on it: default `true`                                                      | boolean                                                     | false    |
 | `HeaderComponent`        | Header component, gets current `imageIndex` as a prop                                               | component, function                                         | false    |
 | `FooterComponent`        | Footer component, gets current `imageIndex` as a prop                                               | component, function                                         | false    |
+| `onPress`                | Function called when image is single pressed                                                        | function (image: ImageSource)                               | false    |
+| `doubleTapDelay`         | Delay in ms, to handle multiple taps: default `300`                                                 | number                                                      | false    |    
+| `withBlurBackground`     | Add a blur background: default `true`                                                               | boolean                                                     | false    |    
+| `blurRadius`             | The blur radius of the blur filter added to the image: default `10`                                 | number                                                      | false    |    
+| `blurOverlayColor`       | A string that represent a color. You should use a transparency color.                               | string                                                      | false    |  
 
 - type ImageSource = ImageURISource | ImageRequireSource
 
