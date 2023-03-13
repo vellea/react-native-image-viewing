@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+import { ImageProps } from 'expo-image';
 import React from 'react';
 import { ImageSource } from '../../@types';
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
     swipeToCloseEnabled?: boolean;
     doubleTapToZoomEnabled?: boolean;
     doubleTapDelay: number;
+    imageProps?: ImageProps;
 };
-declare const _default: React.MemoExoticComponent<({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, delayLongPress, swipeToCloseEnabled, doubleTapToZoomEnabled, doubleTapDelay, }: Props) => JSX.Element>;
+declare const _default: React.MemoExoticComponent<({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, delayLongPress, swipeToCloseEnabled, doubleTapToZoomEnabled, doubleTapDelay, imageProps, }: Props) => JSX.Element>;
 export default _default;

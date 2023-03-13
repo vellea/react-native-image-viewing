@@ -9,11 +9,12 @@
 import {
   Animated,
   GestureResponderEvent,
+  NativeTouchEvent,
   PanResponder,
   PanResponderGestureState,
   PanResponderInstance,
-  NativeTouchEvent,
 } from 'react-native';
+
 import { Dimensions, Position } from './@types';
 
 type CacheStorageItem = { key: string; value: any };

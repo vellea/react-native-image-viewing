@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { Animated, GestureResponderEvent, PanResponderGestureState, PanResponderInstance, NativeTouchEvent } from 'react-native';
+import { Animated, GestureResponderEvent, NativeTouchEvent, PanResponderGestureState, PanResponderInstance } from 'react-native';
 import { Dimensions, Position } from './@types';
 type CacheStorageItem = {
     key: string;

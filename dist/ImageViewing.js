@@ -5,10 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import React, { useCallback, useRef, useEffect } from 'react';
-import { Animated, Dimensions, StyleSheet, View, VirtualizedList, Modal, } from 'react-native';
-import ImageItem from './components/ImageItem/ImageItem';
+import { Image } from 'expo-image';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { Animated, Dimensions, Modal, StyleSheet, View, VirtualizedList, } from 'react-native';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
+import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';
 import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
@@ -19,7 +20,7 @@ const DEFAULT_DELAY_LONG_PRESS = 800;
 const DEFAULT_DOUBLE_TAP_DELAY = 300;
 const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
-function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onPress = () => { }, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent, doubleTapDelay = DEFAULT_DOUBLE_TAP_DELAY, withBlurBackground = true, blurRadius = 10, blurOverlayColor, }) {
+function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onPress = () => { }, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent, doubleTapDelay = DEFAULT_DOUBLE_TAP_DELAY, withBlurBackground = true, blurRadius = 10, blurOverlayColor, imageProps, }) {
     const imageList = useRef(null);
     const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
     const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
@@ -53,12 +54,14 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
             length: SCREEN_WIDTH,
             offset: SCREEN_WIDTH * index,
             index,
-        })} renderItem={({ item: imageSrc }) => (<>
-              {withBlurBackground && (<Animated.Image source={imageSrc} style={styles.absolute} blurRadius={blurRadius}/>)}
-              <View style={blurOverlayStyle}>
-                <ImageItem onZoom={onZoom} imageSrc={imageSrc} onRequestClose={onRequestCloseEnhanced} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} swipeToCloseEnabled={swipeToCloseEnabled} doubleTapToZoomEnabled={doubleTapToZoomEnabled} doubleTapDelay={doubleTapDelay}/>
-              </View>
-            </>)} onMomentumScrollEnd={onScroll} 
+        })} renderItem={({ item: imageSrc }) => {
+            return (<View>
+                {withBlurBackground && (<Image {...imageProps} source={imageSrc} style={styles.absolute} blurRadius={blurRadius}/>)}
+                <View style={blurOverlayStyle}>
+                  <ImageItem onZoom={onZoom} imageSrc={imageSrc} onRequestClose={onRequestCloseEnhanced} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} swipeToCloseEnabled={swipeToCloseEnabled} doubleTapToZoomEnabled={doubleTapToZoomEnabled} doubleTapDelay={doubleTapDelay} imageProps={imageProps}/>
+                </View>
+              </View>);
+        }} onMomentumScrollEnd={onScroll} 
     //@ts-ignore
     keyExtractor={(imageSrc, index) => keyExtractor
             ? keyExtractor(imageSrc, index)

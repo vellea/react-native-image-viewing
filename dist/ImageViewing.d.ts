@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+import { ImageProps } from 'expo-image';
 import { ComponentType } from 'react';
 import { ModalProps } from 'react-native';
 import { ImageSource } from './@types';
@@ -33,6 +34,7 @@ type Props = {
     withBlurBackground?: boolean;
     blurRadius?: number;
     blurOverlayColor?: string;
+    imageProps?: ImageProps;
 };
 declare const EnhancedImageViewing: (props: Props) => JSX.Element;
 export default EnhancedImageViewing;

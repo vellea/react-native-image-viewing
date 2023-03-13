@@ -6,25 +6,25 @@
  *
  */
 
-import React, { ComponentType, useCallback, useRef, useEffect } from 'react';
+import { Image, ImageProps } from 'expo-image';
+import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
   Dimensions,
+  Modal,
+  ModalProps,
   StyleSheet,
   View,
   VirtualizedList,
-  ModalProps,
-  Modal,
 } from 'react-native';
 
-import ImageItem from './components/ImageItem/ImageItem';
+import { ImageSource } from './@types';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
+import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';
-
 import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
 import useRequestClose from './hooks/useRequestClose';
-import { ImageSource } from './@types';
 
 type Props = {
   images: ImageSource[];
@@ -47,6 +47,7 @@ type Props = {
   withBlurBackground?: boolean;
   blurRadius?: number;
   blurOverlayColor?: string;
+  imageProps?: ImageProps;
 };
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
@@ -77,6 +78,7 @@ function ImageViewing({
   withBlurBackground = true,
   blurRadius = 10,
   blurOverlayColor,
+  imageProps,
 }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
@@ -147,30 +149,34 @@ function ImageViewing({
             offset: SCREEN_WIDTH * index,
             index,
           })}
-          renderItem={({ item: imageSrc }: { item: ImageSource }) => (
-            <>
-              {withBlurBackground && (
-                <Animated.Image
-                  source={imageSrc}
-                  style={styles.absolute}
-                  blurRadius={blurRadius}
-                />
-              )}
-              <View style={blurOverlayStyle}>
-                <ImageItem
-                  onZoom={onZoom}
-                  imageSrc={imageSrc}
-                  onRequestClose={onRequestCloseEnhanced}
-                  onPress={onPress}
-                  onLongPress={onLongPress}
-                  delayLongPress={delayLongPress}
-                  swipeToCloseEnabled={swipeToCloseEnabled}
-                  doubleTapToZoomEnabled={doubleTapToZoomEnabled}
-                  doubleTapDelay={doubleTapDelay}
-                />
+          renderItem={({ item: imageSrc }: { item: ImageSource }) => {
+            return (
+              <View>
+                {withBlurBackground && (
+                  <Image
+                    {...imageProps}
+                    source={imageSrc}
+                    style={styles.absolute}
+                    blurRadius={blurRadius}
+                  />
+                )}
+                <View style={blurOverlayStyle}>
+                  <ImageItem
+                    onZoom={onZoom}
+                    imageSrc={imageSrc}
+                    onRequestClose={onRequestCloseEnhanced}
+                    onPress={onPress}
+                    onLongPress={onLongPress}
+                    delayLongPress={delayLongPress}
+                    swipeToCloseEnabled={swipeToCloseEnabled}
+                    doubleTapToZoomEnabled={doubleTapToZoomEnabled}
+                    doubleTapDelay={doubleTapDelay}
+                    imageProps={imageProps}
+                  />
+                </View>
               </View>
-            </>
-          )}
+            );
+          }}
           onMomentumScrollEnd={onScroll}
           //@ts-ignore
           keyExtractor={(imageSrc, index) =>
