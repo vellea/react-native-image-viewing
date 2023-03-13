@@ -8,7 +8,6 @@
 import { Image } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
 import { Animated, Dimensions, ScrollView, StyleSheet, } from 'react-native';
-import useImageDimensions from '../../hooks/useImageDimensions';
 import usePanResponder from '../../hooks/usePanResponder';
 import { getImageStyles, getImageTransform } from '../../utils';
 import { ImageLoading } from './ImageLoading';
@@ -22,7 +21,6 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, del
     const imageContainer = useRef(null);
     const [size, setSize] = useState({ width: 0, height: 0 });
     const [isLoaded, setLoadEnd] = useState(false);
-    const imageDimensions = useImageDimensions(imageSrc);
     const [translate, scale] = getImageTransform(size, SCREEN);
     const scrollValueY = new Animated.Value(0);
     const onLoaded = useCallback((e) => {
@@ -82,7 +80,7 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, del
         onScrollEndDrag,
     })}>
       <AnimatedImage {...imageProps} {...panHandlers} source={imageSrc} onLoad={onLoaded} style={imageStylesWithOpacity}/>
-      {(!isLoaded || !imageDimensions) && <ImageLoading />}
+      {!isLoaded && <ImageLoading />}
     </ScrollView>);
 };
 const styles = StyleSheet.create({

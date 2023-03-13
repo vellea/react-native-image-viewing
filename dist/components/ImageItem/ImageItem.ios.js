@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-// import { ImageLoadEventData, ImageProps } from 'expo-image';
 import { Image } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
 import { Animated, Dimensions, ScrollView, StyleSheet, TouchableWithoutFeedback, View, } from 'react-native';
@@ -26,7 +25,6 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPre
     });
     const [loaded, setLoaded] = useState(false);
     const [scaled, setScaled] = useState(false);
-    // const imageDimensions = useImageDimensions(imageSrc);
     const handleDoubleTap = useDoubleTapToZoom({
         scrollViewRef,
         scaled,

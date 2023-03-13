@@ -6,7 +6,6 @@
  *
  */
 
-// import { ImageLoadEventData, ImageProps } from 'expo-image';
 import { Image, ImageLoadEventData, ImageProps } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -66,7 +65,6 @@ const ImageItem = ({
   });
   const [loaded, setLoaded] = useState(false);
   const [scaled, setScaled] = useState(false);
-  // const imageDimensions = useImageDimensions(imageSrc);
   const handleDoubleTap = useDoubleTapToZoom({
     scrollViewRef,
     scaled,
