@@ -26,6 +26,13 @@ import useAnimatedComponents from './hooks/useAnimatedComponents';
 import useImageIndexChange from './hooks/useImageIndexChange';
 import useRequestClose from './hooks/useRequestClose';
 
+type Orientations =
+  | 'portrait'
+  | 'portrait-upside-down'
+  | 'landscape'
+  | 'landscape-left'
+  | 'landscape-right';
+
 type Props = {
   images: ImageSource[];
   keyExtractor?: (imageSrc: ImageSource, index: number) => string;
@@ -48,6 +55,7 @@ type Props = {
   blurRadius?: number;
   blurOverlayColor?: string;
   imageProps?: ImageProps;
+  supportedOrientations?: Orientations[];
 };
 
 const DEFAULT_ANIMATION_TYPE = 'fade';
@@ -79,6 +87,7 @@ function ImageViewing({
   blurRadius = 10,
   blurOverlayColor,
   imageProps,
+  supportedOrientations = ['portrait'],
 }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
@@ -117,7 +126,7 @@ function ImageViewing({
       presentationStyle={presentationStyle}
       animationType={animationType}
       onRequestClose={onRequestCloseEnhanced}
-      supportedOrientations={['portrait']}
+      supportedOrientations={supportedOrientations}
       hardwareAccelerated
     >
       <StatusBarManager presentationStyle={presentationStyle} />

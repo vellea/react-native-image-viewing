@@ -20,7 +20,7 @@ const DEFAULT_DELAY_LONG_PRESS = 800;
 const DEFAULT_DOUBLE_TAP_DELAY = 300;
 const SCREEN = Dimensions.get('screen');
 const SCREEN_WIDTH = SCREEN.width;
-function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onPress = () => { }, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent, doubleTapDelay = DEFAULT_DOUBLE_TAP_DELAY, withBlurBackground = true, blurRadius = 10, blurOverlayColor, imageProps, }) {
+function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onPress = () => { }, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent, doubleTapDelay = DEFAULT_DOUBLE_TAP_DELAY, withBlurBackground = true, blurRadius = 10, blurOverlayColor, imageProps, supportedOrientations = ['portrait'], }) {
     const imageList = useRef(null);
     const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
     const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
@@ -42,7 +42,7 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
     if (!visible) {
         return null;
     }
-    return (<Modal transparent={presentationStyle === 'overFullScreen'} visible={visible} presentationStyle={presentationStyle} animationType={animationType} onRequestClose={onRequestCloseEnhanced} supportedOrientations={['portrait']} hardwareAccelerated>
+    return (<Modal transparent={presentationStyle === 'overFullScreen'} visible={visible} presentationStyle={presentationStyle} animationType={animationType} onRequestClose={onRequestCloseEnhanced} supportedOrientations={supportedOrientations} hardwareAccelerated>
       <StatusBarManager presentationStyle={presentationStyle}/>
       <View style={[styles.container, { opacity, backgroundColor }]}>
         <Animated.View style={[styles.header, { transform: headerTransform }]}>
