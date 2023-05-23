@@ -6,8 +6,8 @@
  *
  */
 import { Image } from 'expo-image';
-import React, { useCallback, useEffect, useRef } from 'react';
-import { Animated, Dimensions, Modal, StyleSheet, View, VirtualizedList, } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState, } from 'react';
+import { Animated, Modal, StyleSheet, View, VirtualizedList, } from 'react-native';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';
@@ -18,12 +18,11 @@ const DEFAULT_ANIMATION_TYPE = 'fade';
 const DEFAULT_BG_COLOR = '#000';
 const DEFAULT_DELAY_LONG_PRESS = 800;
 const DEFAULT_DOUBLE_TAP_DELAY = 300;
-const SCREEN = Dimensions.get('screen');
-const SCREEN_WIDTH = SCREEN.width;
 function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClose, onPress = () => { }, onLongPress = () => { }, onImageIndexChange, animationType = DEFAULT_ANIMATION_TYPE, backgroundColor = DEFAULT_BG_COLOR, presentationStyle, swipeToCloseEnabled, doubleTapToZoomEnabled, delayLongPress = DEFAULT_DELAY_LONG_PRESS, HeaderComponent, FooterComponent, doubleTapDelay = DEFAULT_DOUBLE_TAP_DELAY, withBlurBackground = true, blurRadius = 10, blurOverlayColor, imageProps, supportedOrientations = ['portrait'], }) {
     const imageList = useRef(null);
     const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
-    const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
+    const [layout, setLayout] = useState({ width: 0, height: 0 });
+    const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, layout);
     const [headerTransform, footerTransform, toggleBarsVisible] = useAnimatedComponents();
     const blurOverlayStyle = withBlurBackground && blurOverlayColor
         ? { backgroundColor: blurOverlayColor }
@@ -44,21 +43,21 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
     }
     return (<Modal transparent={presentationStyle === 'overFullScreen'} visible={visible} presentationStyle={presentationStyle} animationType={animationType} onRequestClose={onRequestCloseEnhanced} supportedOrientations={supportedOrientations} hardwareAccelerated>
       <StatusBarManager presentationStyle={presentationStyle}/>
-      <View style={[styles.container, { opacity, backgroundColor }]}>
+      <View style={[styles.container, { opacity, backgroundColor }]} onLayout={(e) => setLayout(e.nativeEvent.layout)}>
         <Animated.View style={[styles.header, { transform: headerTransform }]}>
           {typeof HeaderComponent !== 'undefined' ? (React.createElement(HeaderComponent, {
             imageIndex: currentImageIndex,
         })) : (<ImageDefaultHeader onRequestClose={onRequestCloseEnhanced}/>)}
         </Animated.View>
         <VirtualizedList ref={imageList} data={images} horizontal pagingEnabled windowSize={2} initialNumToRender={1} maxToRenderPerBatch={1} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} initialScrollIndex={imageIndex} getItem={(_, index) => images[index]} getItemCount={() => images.length} getItemLayout={(_, index) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
+            length: layout.width,
+            offset: layout.width * index,
             index,
         })} renderItem={({ item: imageSrc }) => {
             return (<View>
                 {withBlurBackground && (<Image {...imageProps} source={imageSrc} style={styles.absolute} blurRadius={blurRadius}/>)}
                 <View style={blurOverlayStyle}>
-                  <ImageItem onZoom={onZoom} imageSrc={imageSrc} onRequestClose={onRequestCloseEnhanced} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} swipeToCloseEnabled={swipeToCloseEnabled} doubleTapToZoomEnabled={doubleTapToZoomEnabled} doubleTapDelay={doubleTapDelay} imageProps={imageProps}/>
+                  <ImageItem onZoom={onZoom} imageSrc={imageSrc} onRequestClose={onRequestCloseEnhanced} onPress={onPress} onLongPress={onLongPress} delayLongPress={delayLongPress} swipeToCloseEnabled={swipeToCloseEnabled} doubleTapToZoomEnabled={doubleTapToZoomEnabled} doubleTapDelay={doubleTapDelay} imageProps={imageProps} layout={layout}/>
                 </View>
               </View>);
         }} onMomentumScrollEnd={onScroll} 

@@ -7,33 +7,30 @@
  */
 import { Image } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
-import { Animated, Dimensions, ScrollView, StyleSheet, TouchableWithoutFeedback, View, } from 'react-native';
+import { Animated, ScrollView, TouchableWithoutFeedback, View, } from 'react-native';
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom';
 import { getImageStyles, getImageTransform } from '../../utils';
 import { ImageLoading } from './ImageLoading';
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.55;
-const SCREEN = Dimensions.get('screen');
-const SCREEN_WIDTH = SCREEN.width;
-const SCREEN_HEIGHT = SCREEN.height;
 const AnimatedImage = Animated.createAnimatedComponent(Image);
-const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, onPress, doubleTapDelay, imageProps, }) => {
+const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, onPress, doubleTapDelay, imageProps, layout, }) => {
     const scrollViewRef = useRef(null);
     const [size, setSize] = useState({
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
+        width: layout.width,
+        height: layout.height,
     });
     const [loaded, setLoaded] = useState(false);
     const [scaled, setScaled] = useState(false);
     const handleDoubleTap = useDoubleTapToZoom({
         scrollViewRef,
         scaled,
-        screen: SCREEN,
+        screen: layout,
         onPress: () => onPress(imageSrc),
         doubleTapToZoomEnabled,
         doubleTapDelay,
     });
-    const [translate, scale] = getImageTransform(size, SCREEN);
+    const [translate, scale] = getImageTransform(size, layout);
     const scrollValueY = new Animated.Value(0);
     const scaleValue = new Animated.Value(scale || 1);
     const translateValue = new Animated.ValueXY(translate);
@@ -74,24 +71,21 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPre
         });
         setLoaded(true);
     }, []);
+    const layoutStyle = React.useMemo(() => ({
+        width: layout.width,
+        height: layout.height,
+    }), [layout]);
     return (<View>
-      <ScrollView ref={scrollViewRef} style={styles.listItem} pinchGestureEnabled showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} maximumZoomScale={maxScale} contentContainerStyle={styles.imageScrollContainer} scrollEnabled={swipeToCloseEnabled} onScrollEndDrag={onScrollEndDrag} scrollEventThrottle={1} {...(swipeToCloseEnabled && {
+      <ScrollView ref={scrollViewRef} style={layoutStyle} pinchGestureEnabled showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} maximumZoomScale={maxScale} contentContainerStyle={{
+            height: layout.height * 2,
+        }} scrollEnabled={swipeToCloseEnabled} onScrollEndDrag={onScrollEndDrag} scrollEventThrottle={1} {...(swipeToCloseEnabled && {
         onScroll,
     })}>
-        {!loaded && <ImageLoading />}
+        {!loaded && <ImageLoading style={layoutStyle}/>}
         <TouchableWithoutFeedback onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined} onLongPress={onLongPressHandler} delayLongPress={delayLongPress}>
           <AnimatedImage {...imageProps} source={imageSrc} style={[imageStylesWithOpacity]} onLoad={onLoaded}/>
         </TouchableWithoutFeedback>
       </ScrollView>
     </View>);
 };
-const styles = StyleSheet.create({
-    listItem: {
-        width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT,
-    },
-    imageScrollContainer: {
-        height: SCREEN_HEIGHT,
-    },
-});
 export default React.memo(ImageItem);

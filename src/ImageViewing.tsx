@@ -7,10 +7,15 @@
  */
 
 import { Image, ImageProps } from 'expo-image';
-import React, { ComponentType, useCallback, useEffect, useRef } from 'react';
+import React, {
+  ComponentType,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Animated,
-  Dimensions,
   Modal,
   ModalProps,
   StyleSheet,
@@ -18,7 +23,7 @@ import {
   VirtualizedList,
 } from 'react-native';
 
-import { ImageSource } from './@types';
+import { ImageSource, Dimensions } from './@types';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';
@@ -62,8 +67,6 @@ const DEFAULT_ANIMATION_TYPE = 'fade';
 const DEFAULT_BG_COLOR = '#000';
 const DEFAULT_DELAY_LONG_PRESS = 800;
 const DEFAULT_DOUBLE_TAP_DELAY = 300;
-const SCREEN = Dimensions.get('screen');
-const SCREEN_WIDTH = SCREEN.width;
 
 function ImageViewing({
   images,
@@ -91,7 +94,8 @@ function ImageViewing({
 }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
-  const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
+  const [layout, setLayout] = useState<Dimensions>({ width: 0, height: 0 });
+  const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, layout);
   const [headerTransform, footerTransform, toggleBarsVisible] =
     useAnimatedComponents();
 
@@ -130,7 +134,10 @@ function ImageViewing({
       hardwareAccelerated
     >
       <StatusBarManager presentationStyle={presentationStyle} />
-      <View style={[styles.container, { opacity, backgroundColor }]}>
+      <View
+        style={[styles.container, { opacity, backgroundColor }]}
+        onLayout={(e) => setLayout(e.nativeEvent.layout)}
+      >
         <Animated.View style={[styles.header, { transform: headerTransform }]}>
           {typeof HeaderComponent !== 'undefined' ? (
             React.createElement(HeaderComponent, {
@@ -154,8 +161,8 @@ function ImageViewing({
           getItem={(_: ImageSource, index: number) => images[index]}
           getItemCount={() => images.length}
           getItemLayout={(_: ImageSource, index: number) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
+            length: layout.width,
+            offset: layout.width * index,
             index,
           })}
           renderItem={({ item: imageSrc }: { item: ImageSource }) => {
@@ -181,6 +188,7 @@ function ImageViewing({
                     doubleTapToZoomEnabled={doubleTapToZoomEnabled}
                     doubleTapDelay={doubleTapDelay}
                     imageProps={imageProps}
+                    layout={layout}
                   />
                 </View>
               </View>

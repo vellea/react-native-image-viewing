@@ -10,7 +10,6 @@ import { Image, ImageLoadEventData, ImageProps } from 'expo-image';
 import React, { useCallback, useRef, useState } from 'react';
 import {
   Animated,
-  Dimensions,
   NativeMethodsMixin,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -18,16 +17,13 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import { ImageSource } from '../../@types';
+import { ImageSource, Dimensions } from '../../@types';
 import usePanResponder from '../../hooks/usePanResponder';
 import { getImageStyles, getImageTransform } from '../../utils';
 import { ImageLoading } from './ImageLoading';
 
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
-const SCREEN = Dimensions.get('window');
-const SCREEN_WIDTH = SCREEN.width;
-const SCREEN_HEIGHT = SCREEN.height;
 
 type Props = {
   imageSrc: ImageSource;
@@ -40,6 +36,7 @@ type Props = {
   doubleTapToZoomEnabled?: boolean;
   doubleTapDelay: number;
   imageProps?: ImageProps;
+  layout: Dimensions;
 };
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
@@ -55,13 +52,14 @@ const ImageItem = ({
   doubleTapToZoomEnabled = true,
   doubleTapDelay,
   imageProps,
+  layout,
 }: Props) => {
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
 
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [isLoaded, setLoadEnd] = useState(false);
 
-  const [translate, scale] = getImageTransform(size, SCREEN);
+  const [translate, scale] = getImageTransform(size, layout);
   const scrollValueY = new Animated.Value(0);
 
   const onLoaded = useCallback((e: ImageLoadEventData) => {
@@ -102,6 +100,7 @@ const ImageItem = ({
     delayLongPress,
     onPress: onPressHandler,
     doubleTapDelay,
+    layout,
   });
 
   const imagesStyles = getImageStyles(size, translateValue, scaleValue);
@@ -120,7 +119,7 @@ const ImageItem = ({
     if (
       (Math.abs(velocityY) > SWIPE_CLOSE_VELOCITY &&
         offsetY > SWIPE_CLOSE_OFFSET) ||
-      offsetY > SCREEN_HEIGHT / 2
+      offsetY > layout.height / 2
     ) {
       onRequestClose();
     }
@@ -134,15 +133,25 @@ const ImageItem = ({
     scrollValueY.setValue(offsetY);
   };
 
+  const layoutStyle = React.useMemo(
+    () => ({
+      width: layout.width,
+      height: layout.height,
+    }),
+    [layout]
+  );
+
   return (
     <ScrollView
       ref={imageContainer}
-      style={styles.listItem}
+      style={layoutStyle}
       pagingEnabled
       nestedScrollEnabled
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.imageScrollContainer}
+      contentContainerStyle={{
+        height: layout.height * 2,
+      }}
       scrollEnabled={swipeToCloseEnabled}
       {...(swipeToCloseEnabled && {
         onScroll,
@@ -156,19 +165,9 @@ const ImageItem = ({
         onLoad={onLoaded}
         style={imageStylesWithOpacity}
       />
-      {!isLoaded && <ImageLoading />}
+      {!isLoaded && <ImageLoading style={layoutStyle} />}
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  listItem: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-  },
-  imageScrollContainer: {
-    height: SCREEN_HEIGHT * 2,
-  },
-});
 
 export default React.memo(ImageItem);

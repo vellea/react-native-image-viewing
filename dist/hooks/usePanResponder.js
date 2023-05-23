@@ -6,15 +6,11 @@
  *
  */
 import { useMemo, useEffect } from 'react';
-import { Animated, Dimensions, } from 'react-native';
+import { Animated, } from 'react-native';
 import { createPanResponder, getDistanceBetweenTouches, getImageTranslate, getImageDimensionsByTranslate, } from '../utils';
-const SCREEN = Dimensions.get('window');
-const SCREEN_WIDTH = SCREEN.width;
-const SCREEN_HEIGHT = SCREEN.height;
-const MIN_DIMENSION = Math.min(SCREEN_WIDTH, SCREEN_HEIGHT);
 const SCALE_MAX = 2;
 const OUT_BOUND_MULTIPLIER = 0.75;
-const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZoomEnabled, onLongPress, delayLongPress, onPress, doubleTapDelay, }) => {
+const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZoomEnabled, onLongPress, delayLongPress, onPress, doubleTapDelay, layout, }) => {
     let numberInitialTouches = 1;
     let initialTouches = [];
     let currentScale = initialScale;
@@ -25,20 +21,20 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
     let lastTapTS = null;
     let longPressHandlerRef = null;
     let singlePressHandlerRef = null;
-    const meaningfulShift = MIN_DIMENSION * 0.01;
+    const meaningfulShift = Math.min(layout.width, layout.height) * 0.01;
     const scaleValue = new Animated.Value(initialScale);
     const translateValue = new Animated.ValueXY(initialTranslate);
-    const imageDimensions = getImageDimensionsByTranslate(initialTranslate, SCREEN);
+    const imageDimensions = getImageDimensionsByTranslate(initialTranslate, layout);
     const getBounds = (scale) => {
         const scaledImageDimensions = {
             width: imageDimensions.width * scale,
             height: imageDimensions.height * scale,
         };
-        const translateDelta = getImageTranslate(scaledImageDimensions, SCREEN);
+        const translateDelta = getImageTranslate(scaledImageDimensions, layout);
         const left = initialTranslate.x - translateDelta.x;
-        const right = left - (scaledImageDimensions.width - SCREEN.width);
+        const right = left - (scaledImageDimensions.width - layout.width);
         const top = initialTranslate.y - translateDelta.y;
-        const bottom = top - (scaledImageDimensions.height - SCREEN.height);
+        const bottom = top - (scaledImageDimensions.height - layout.height);
         return [top, left, bottom, right];
     };
     const getTranslateInBounds = (translate, scale) => {
@@ -58,8 +54,8 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
         }
         return inBoundTranslate;
     };
-    const fitsScreenByWidth = () => imageDimensions.width * currentScale < SCREEN_WIDTH;
-    const fitsScreenByHeight = () => imageDimensions.height * currentScale < SCREEN_HEIGHT;
+    const fitsScreenByWidth = () => imageDimensions.width * currentScale < layout.width;
+    const fitsScreenByHeight = () => imageDimensions.height * currentScale < layout.height;
     useEffect(() => {
         scaleValue.addListener(({ value }) => {
             if (typeof onZoom === 'function') {
@@ -99,9 +95,9 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
                     ? initialTranslate
                     : getTranslateInBounds({
                         x: initialTranslate.x +
-                            (SCREEN_WIDTH / 2 - touchX) * (targetScale / currentScale),
+                            (layout.width / 2 - touchX) * (targetScale / currentScale),
                         y: initialTranslate.y +
-                            (SCREEN_HEIGHT / 2 - touchY) * (targetScale / currentScale),
+                            (layout.height / 2 - touchY) * (targetScale / currentScale),
                     }, targetScale);
                 onZoom(!isScaled);
                 Animated.parallel([

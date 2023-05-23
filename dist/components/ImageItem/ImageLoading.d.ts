@@ -5,4 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-export declare const ImageLoading: () => JSX.Element;
+import React from 'react';
+import { ViewProps } from 'react-native';
+export declare const ImageLoading: React.FC<ViewProps>;

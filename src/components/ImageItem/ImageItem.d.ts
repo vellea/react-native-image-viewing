@@ -9,7 +9,7 @@
 import { ImageProps } from 'expo-image';
 import React, { ComponentType } from 'react';
 
-import { ImageSource } from '../../@types';
+import { ImageSource, Dimensions } from '../../@types';
 
 declare type Props = {
   imageSrc: ImageSource;
@@ -23,6 +23,7 @@ declare type Props = {
   doubleTapDelay: number;
   imageProps?: ImageProps;
   CustomImageComponent?: ComponentType;
+  layout: Dimensions;
 };
 
 declare const _default: React.MemoExoticComponent<
@@ -38,6 +39,7 @@ declare const _default: React.MemoExoticComponent<
     doubleTapDelay,
     imageProps,
     CustomImageComponent,
+    layout,
   }: Props) => JSX.Element
 >;
 
