@@ -6,17 +6,21 @@
  *
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 
 import {
   ActivityIndicator,
-  Dimensions,
+  StyleProp,
   StyleSheet,
   View,
-  ViewProps,
+  ViewStyle,
 } from 'react-native';
 
-export const ImageLoading: React.FC<ViewProps> = ({ style }) => (
+type ImageLoadingProps = {
+  style?: StyleProp<ViewStyle>;
+};
+
+const ImageLoading = ({ style }: ImageLoadingProps) => (
   <View style={[style, styles.loading]}>
     <ActivityIndicator size="small" color="#FFF" />
   </View>
@@ -28,3 +32,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+export default memo(ImageLoading);

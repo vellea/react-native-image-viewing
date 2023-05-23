@@ -10,7 +10,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Animated, ScrollView, } from 'react-native';
 import usePanResponder from '../../hooks/usePanResponder';
 import { getImageStyles, getImageTransform } from '../../utils';
-import { ImageLoading } from './ImageLoading';
+import ImageLoading from './ImageLoading';
 const SWIPE_CLOSE_OFFSET = 75;
 const SWIPE_CLOSE_VELOCITY = 1.75;
 const AnimatedImage = Animated.createAnimatedComponent(Image);
@@ -78,7 +78,7 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, del
         height: layout.height,
     }), [layout]);
     return (<ScrollView ref={imageContainer} style={layoutStyle} pagingEnabled nestedScrollEnabled showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} contentContainerStyle={{
-            height: layout.height * 2,
+            height: layout.height,
         }} scrollEnabled={swipeToCloseEnabled} {...(swipeToCloseEnabled && {
         onScroll,
         onScrollEndDrag,

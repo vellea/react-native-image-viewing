@@ -6,5 +6,9 @@
  *
  */
 import React from 'react';
-import { ViewProps } from 'react-native';
-export declare const ImageLoading: React.FC<ViewProps>;
+import { StyleProp, ViewStyle } from 'react-native';
+type ImageLoadingProps = {
+    style?: StyleProp<ViewStyle>;
+};
+declare const _default: React.MemoExoticComponent<({ style }: ImageLoadingProps) => JSX.Element>;
+export default _default;
