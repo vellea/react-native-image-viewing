@@ -7,7 +7,7 @@
  */
 
 import { Image, ImageLoadEventData, ImageProps } from 'expo-image';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   GestureResponderEvent,
@@ -57,10 +57,10 @@ const ImageItem = ({
   layout,
 }: Props) => {
   const scrollViewRef = useRef<ScrollView>(null);
-  const [size, setSize] = useState({
-    width: layout.width,
-    height: layout.height,
-  });
+  const [size, setSize] = useState(() => ({
+    width: 0,
+    height: 0,
+  }));
   const [loaded, setLoaded] = useState(false);
   const [scaled, setScaled] = useState(false);
   const handleDoubleTap = useDoubleTapToZoom({
@@ -78,13 +78,12 @@ const ImageItem = ({
   const translateValue = new Animated.ValueXY(translate);
   const maxScale = scale && scale > 0 ? Math.max(1 / scale, 1) : 1;
 
-  const imagesStyles = getImageStyles(size, translateValue, scaleValue);
   const imageOpacity = scrollValueY.interpolate({
     inputRange: [-SWIPE_CLOSE_OFFSET, 0, SWIPE_CLOSE_OFFSET],
     outputRange: [0.5, 1, 0.5],
   });
-
-  console.log('setLoaded', loaded);
+  const imagesStyles = getImageStyles(size, translateValue, scaleValue);
+  const imageStylesWithOpacity = { ...imagesStyles, opacity: imageOpacity };
 
   const onScrollEndDrag = useCallback(
     ({ nativeEvent }: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -131,45 +130,57 @@ const ImageItem = ({
     });
 
     setLoaded(true);
-    console.log('setLoaded true');
   }, []);
 
+  const layoutStyle = React.useMemo(
+    () => ({
+      width: layout.width,
+      height: layout.height,
+    }),
+    [layout]
+  );
+
+  useEffect(() => {
+    if (size.width === 0 && size.height === 0) {
+      setSize(layout);
+    }
+  }, [layout]);
+
   return (
-    <ScrollView
-      ref={scrollViewRef}
-      style={{
-        width: layout.width,
-        height: layout.height,
-      }}
-      pinchGestureEnabled
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-      maximumZoomScale={maxScale}
-      contentContainerStyle={{
-        height: layout.height * 2,
-      }}
-      scrollEnabled={swipeToCloseEnabled}
-      onScrollEndDrag={onScrollEndDrag}
-      scrollEventThrottle={1}
-      {...(swipeToCloseEnabled && {
-        onScroll,
-      })}
-    >
-      {!loaded && <ImageLoading />}
-      <TouchableWithoutFeedback
-        onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined}
-        onLongPress={onLongPressHandler}
-        delayLongPress={delayLongPress}
+    <View>
+      <ScrollView
+        ref={scrollViewRef}
+        style={layoutStyle}
+        pinchGestureEnabled
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        maximumZoomScale={maxScale}
+        contentContainerStyle={{
+          height: layout.height,
+        }}
+        scrollEnabled={swipeToCloseEnabled}
+        onScrollEndDrag={onScrollEndDrag}
+        scrollEventThrottle={1}
+        {...(swipeToCloseEnabled && {
+          onScroll,
+        })}
       >
-        <AnimatedImage
-          {...imageProps}
-          source={imageSrc}
-          style={[imagesStyles, { opacity: imageOpacity }]}
-          onLoad={onLoaded}
-        />
-      </TouchableWithoutFeedback>
-    </ScrollView>
+        {!loaded && <ImageLoading style={layoutStyle} />}
+        <TouchableWithoutFeedback
+          onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined}
+          onLongPress={onLongPressHandler}
+          delayLongPress={delayLongPress}
+        >
+          <AnimatedImage
+            {...imageProps}
+            source={imageSrc}
+            style={imageStylesWithOpacity}
+            onLoad={onLoaded}
+          />
+        </TouchableWithoutFeedback>
+      </ScrollView>
+    </View>
   );
 };
 
-export default React.memo(ImageItem);
+export default ImageItem;

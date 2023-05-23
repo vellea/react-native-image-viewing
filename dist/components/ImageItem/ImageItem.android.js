@@ -17,7 +17,7 @@ const AnimatedImage = Animated.createAnimatedComponent(Image);
 const ImageItem = ({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, delayLongPress, swipeToCloseEnabled = true, doubleTapToZoomEnabled = true, doubleTapDelay, imageProps, layout, }) => {
     const imageContainer = useRef(null);
     const [size, setSize] = useState({ width: 0, height: 0 });
-    const [isLoaded, setLoadEnd] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
     const [translate, scale] = getImageTransform(size, layout);
     const scrollValueY = new Animated.Value(0);
     const onLoaded = useCallback((e) => {
@@ -25,7 +25,7 @@ const ImageItem = ({ imageSrc, onZoom, onRequestClose, onPress, onLongPress, del
             width: e.source.width,
             height: e.source.height,
         });
-        setLoadEnd(true);
+        setIsLoaded(true);
     }, []);
     const onZoomPerformed = useCallback((isZoomed) => {
         onZoom(isZoomed);

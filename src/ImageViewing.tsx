@@ -152,7 +152,7 @@ function ImageViewing({
           data={images}
           horizontal
           pagingEnabled
-          windowSize={1}
+          windowSize={2}
           initialNumToRender={1}
           maxToRenderPerBatch={1}
           showsHorizontalScrollIndicator={false}
