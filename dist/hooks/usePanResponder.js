@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { useMemo, useEffect } from 'react';
-import { Animated, } from 'react-native';
-import { createPanResponder, getDistanceBetweenTouches, getImageTranslate, getImageDimensionsByTranslate, } from '../utils';
+import { useEffect, useMemo } from 'react';
+import { Animated, useWindowDimensions, } from 'react-native';
+import { createPanResponder, getDistanceBetweenTouches, getImageDimensionsByTranslate, getImageTranslate, } from '../utils';
 const SCALE_MAX = 2;
 const OUT_BOUND_MULTIPLIER = 0.75;
-const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZoomEnabled, onLongPress, delayLongPress, onPress, doubleTapDelay, layout, }) => {
+const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZoomEnabled, onLongPress, delayLongPress, onPress, doubleTapDelay, }) => {
     let numberInitialTouches = 1;
     let initialTouches = [];
     let currentScale = initialScale;
@@ -21,20 +21,27 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
     let lastTapTS = null;
     let longPressHandlerRef = null;
     let singlePressHandlerRef = null;
-    const meaningfulShift = Math.min(layout.width, layout.height) * 0.01;
+    const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+    const meaningfulShift = Math.min(windowWidth, windowHeight) * 0.01;
     const scaleValue = new Animated.Value(initialScale);
     const translateValue = new Animated.ValueXY(initialTranslate);
-    const imageDimensions = getImageDimensionsByTranslate(initialTranslate, layout);
+    const imageDimensions = getImageDimensionsByTranslate(initialTranslate, {
+        width: windowWidth,
+        height: windowHeight,
+    });
     const getBounds = (scale) => {
         const scaledImageDimensions = {
             width: imageDimensions.width * scale,
             height: imageDimensions.height * scale,
         };
-        const translateDelta = getImageTranslate(scaledImageDimensions, layout);
+        const translateDelta = getImageTranslate(scaledImageDimensions, {
+            width: windowWidth,
+            height: windowHeight,
+        });
         const left = initialTranslate.x - translateDelta.x;
-        const right = left - (scaledImageDimensions.width - layout.width);
+        const right = left - (scaledImageDimensions.width - windowWidth);
         const top = initialTranslate.y - translateDelta.y;
-        const bottom = top - (scaledImageDimensions.height - layout.height);
+        const bottom = top - (scaledImageDimensions.height - windowHeight);
         return [top, left, bottom, right];
     };
     const getTranslateInBounds = (translate, scale) => {
@@ -54,8 +61,8 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
         }
         return inBoundTranslate;
     };
-    const fitsScreenByWidth = () => imageDimensions.width * currentScale < layout.width;
-    const fitsScreenByHeight = () => imageDimensions.height * currentScale < layout.height;
+    const fitsScreenByWidth = () => imageDimensions.width * currentScale < windowWidth;
+    const fitsScreenByHeight = () => imageDimensions.height * currentScale < windowHeight;
     useEffect(() => {
         scaleValue.addListener(({ value }) => {
             if (typeof onZoom === 'function') {
@@ -95,9 +102,9 @@ const usePanResponder = ({ initialScale, initialTranslate, onZoom, doubleTapToZo
                     ? initialTranslate
                     : getTranslateInBounds({
                         x: initialTranslate.x +
-                            (layout.width / 2 - touchX) * (targetScale / currentScale),
+                            (windowWidth / 2 - touchX) * (targetScale / currentScale),
                         y: initialTranslate.y +
-                            (layout.height / 2 - touchY) * (targetScale / currentScale),
+                            (windowHeight / 2 - touchY) * (targetScale / currentScale),
                     }, targetScale);
                 onZoom(!isScaled);
                 Animated.parallel([

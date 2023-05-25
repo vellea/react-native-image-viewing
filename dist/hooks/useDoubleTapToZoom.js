@@ -36,7 +36,6 @@ function useDoubleTapToZoom({ scrollViewRef, scaled, screen, onPress, doubleTapT
                 targetWidth = screen.width / 2;
                 targetHeight = screen.height / 2;
             }
-            // @ts-ignore
             scrollResponderRef === null || scrollResponderRef === void 0 ? void 0 : scrollResponderRef.scrollResponderZoomTo({
                 x: targetX,
                 y: targetY,

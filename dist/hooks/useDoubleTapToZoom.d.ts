@@ -6,7 +6,7 @@
  *
  */
 import React from 'react';
-import { ScrollView, NativeTouchEvent, NativeSyntheticEvent } from 'react-native';
+import { NativeSyntheticEvent, NativeTouchEvent, ScrollView } from 'react-native';
 import { Dimensions } from '../@types';
 type Props = {
     scrollViewRef: React.RefObject<ScrollView>;

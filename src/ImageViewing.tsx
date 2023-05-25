@@ -13,22 +13,24 @@ import React, {
   useEffect,
   useRef,
   useState,
+  useTransition,
 } from 'react';
 import {
   Animated,
   Modal,
   ModalProps,
   StyleSheet,
+  useWindowDimensions,
   View,
+  ViewToken,
   VirtualizedList,
 } from 'react-native';
 
-import { ImageSource, Dimensions } from './@types';
+import { ImageSource } from './@types';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';
 import useAnimatedComponents from './hooks/useAnimatedComponents';
-import useImageIndexChange from './hooks/useImageIndexChange';
 import useRequestClose from './hooks/useRequestClose';
 
 type Orientations =
@@ -93,31 +95,52 @@ function ImageViewing({
   supportedOrientations = ['portrait'],
 }: Props) {
   const imageList = useRef<VirtualizedList<ImageSource>>(null);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isRotating, startRotation] = useTransition();
+
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+
   const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
-  const [layout, setLayout] = useState<Dimensions>({ width: 0, height: 0 });
-  const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, layout);
   const [headerTransform, footerTransform, toggleBarsVisible] =
     useAnimatedComponents();
 
-  const blurOverlayStyle =
-    withBlurBackground && blurOverlayColor
-      ? { backgroundColor: blurOverlayColor }
-      : {};
-
-  useEffect(() => {
-    if (onImageIndexChange) {
-      onImageIndexChange(currentImageIndex);
-    }
-  }, [currentImageIndex]);
-
   const onZoom = useCallback(
     (isScaled: boolean) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       imageList?.current?.setNativeProps({ scrollEnabled: !isScaled });
       toggleBarsVisible(!isScaled);
     },
-    [imageList]
+    [toggleBarsVisible, imageList]
   );
+
+  // Set default index when visible change
+  useEffect(() => {
+    if (visible) {
+      console.log('[ImageViewing] useEffect visible');
+      setCurrentIndex(imageIndex);
+    }
+  }, [visible, imageIndex]);
+
+  // When windowWidth change, reset list to currentIndex
+  useEffect(() => {
+    if (imageList.current) {
+      console.log('[ImageViewing] useEffect startRotation');
+      startRotation(() => {
+        // @ts-ignore
+        imageList.current?.scrollToIndex({
+          index: currentIndex,
+          animated: false,
+        });
+      });
+    }
+  }, [windowWidth, imageList]);
+
+  useEffect(() => {
+    console.log('[ImageViewing] useEffect onImageIndexChange');
+    onImageIndexChange?.(currentIndex);
+  }, [onImageIndexChange, currentIndex]);
 
   if (!visible) {
     return null;
@@ -134,14 +157,11 @@ function ImageViewing({
       hardwareAccelerated
     >
       <StatusBarManager presentationStyle={presentationStyle} />
-      <View
-        style={[styles.container, { opacity, backgroundColor }]}
-        onLayout={(e) => setLayout(e.nativeEvent.layout)}
-      >
+      <View style={[styles.container, { opacity, backgroundColor }]}>
         <Animated.View style={[styles.header, { transform: headerTransform }]}>
           {typeof HeaderComponent !== 'undefined' ? (
             React.createElement(HeaderComponent, {
-              imageIndex: currentImageIndex,
+              imageIndex: currentIndex,
             })
           ) : (
             <ImageDefaultHeader onRequestClose={onRequestCloseEnhanced} />
@@ -158,16 +178,18 @@ function ImageViewing({
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           initialScrollIndex={imageIndex}
-          getItem={(_: ImageSource, index: number) => images[index]}
           getItemCount={() => images.length}
+          getItem={(data: ImageSource[], index: number) => {
+            return data[index];
+          }}
           getItemLayout={(_: ImageSource, index: number) => ({
-            length: layout.width,
-            offset: layout.width * index,
+            length: windowWidth,
+            offset: windowWidth * index,
             index,
           })}
           renderItem={({ item: imageSrc }: { item: ImageSource }) => {
             return (
-              <View>
+              <>
                 {withBlurBackground && (
                   <Image
                     {...imageProps}
@@ -176,7 +198,13 @@ function ImageViewing({
                     blurRadius={blurRadius}
                   />
                 )}
-                <View style={blurOverlayStyle}>
+                <View
+                  style={
+                    withBlurBackground && blurOverlayColor
+                      ? { backgroundColor: blurOverlayColor }
+                      : {}
+                  }
+                >
                   <ImageItem
                     onZoom={onZoom}
                     imageSrc={imageSrc}
@@ -188,20 +216,34 @@ function ImageViewing({
                     doubleTapToZoomEnabled={doubleTapToZoomEnabled}
                     doubleTapDelay={doubleTapDelay}
                     imageProps={imageProps}
-                    layout={layout}
+                    windowSize={{ width: windowWidth, height: windowHeight }}
                   />
                 </View>
-              </View>
+              </>
             );
           }}
-          onMomentumScrollEnd={onScroll}
-          //@ts-ignore
-          keyExtractor={(imageSrc, index) =>
-            keyExtractor
-              ? keyExtractor(imageSrc, index)
-              : typeof imageSrc === 'number'
-              ? `${imageSrc}`
-              : imageSrc.uri
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 100,
+          }}
+          onViewableItemsChanged={({
+            changed,
+            viewableItems,
+          }: {
+            changed: ViewToken[];
+            viewableItems: ViewToken[];
+          }) => {
+            if (isRotating) return;
+
+            if (changed[0].index === 1 && viewableItems.length === 0) {
+              setCurrentIndex(0);
+            } else if (viewableItems.length > 0 && viewableItems[0].index) {
+              setCurrentIndex(viewableItems[0].index);
+            }
+          }}
+          keyExtractor={(imageSrc: ImageSource, index: number) =>
+            keyExtractor?.(imageSrc, index) ?? typeof imageSrc === 'number'
+              ? imageSrc.toString()
+              : imageSrc?.uri ?? index.toString()
           }
         />
         {typeof FooterComponent !== 'undefined' && (
@@ -209,7 +251,7 @@ function ImageViewing({
             style={[styles.footer, { transform: footerTransform }]}
           >
             {React.createElement(FooterComponent, {
-              imageIndex: currentImageIndex,
+              imageIndex: currentIndex,
             })}
           </Animated.View>
         )}

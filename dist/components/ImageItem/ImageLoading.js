@@ -6,10 +6,13 @@
  *
  */
 import React, { memo } from 'react';
-import { ActivityIndicator, StyleSheet, View, } from 'react-native';
-const ImageLoading = ({ style }) => (<View style={[style, styles.loading]}>
-    <ActivityIndicator size="small" color="#FFF"/>
-  </View>);
+import { ActivityIndicator, StyleSheet, useWindowDimensions, View, } from 'react-native';
+const ImageLoading = () => {
+    const { width, height } = useWindowDimensions();
+    return (<View style={[{ width, height }, styles.loading]}>
+      <ActivityIndicator size="small" color="#FFF"/>
+    </View>);
+};
 const styles = StyleSheet.create({
     loading: {
         alignItems: 'center',

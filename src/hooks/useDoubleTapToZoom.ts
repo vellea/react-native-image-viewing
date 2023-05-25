@@ -8,15 +8,15 @@
 
 import React, { useCallback } from 'react';
 import {
-  ScrollView,
-  NativeTouchEvent,
   NativeSyntheticEvent,
+  NativeTouchEvent,
+  ScrollView,
 } from 'react-native';
 
 import { Dimensions } from '../@types';
 
 let lastTapTS: number | null = null;
-let singleTapTimeout: number | null = null;
+let singleTapTimeout: NodeJS.Timeout | null = null;
 
 type Props = {
   scrollViewRef: React.RefObject<ScrollView>;
@@ -68,7 +68,6 @@ function useDoubleTapToZoom({
           targetHeight = screen.height / 2;
         }
 
-        // @ts-ignore
         scrollResponderRef?.scrollResponderZoomTo({
           x: targetX,
           y: targetY,

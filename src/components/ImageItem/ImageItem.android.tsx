@@ -14,10 +14,9 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
-  StyleSheet,
 } from 'react-native';
 
-import { ImageSource, Dimensions } from '../../@types';
+import { ImageSource } from '../../@types';
 import usePanResponder from '../../hooks/usePanResponder';
 import { getImageStyles, getImageTransform } from '../../utils';
 import ImageLoading from './ImageLoading';
@@ -36,7 +35,7 @@ type Props = {
   doubleTapToZoomEnabled?: boolean;
   doubleTapDelay: number;
   imageProps?: ImageProps;
-  layout: Dimensions;
+  windowSize: { width: number; height: number };
 };
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
@@ -52,14 +51,17 @@ const ImageItem = ({
   doubleTapToZoomEnabled = true,
   doubleTapDelay,
   imageProps,
-  layout,
+  windowSize,
 }: Props) => {
   const imageContainer = useRef<ScrollView & NativeMethodsMixin>(null);
 
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const [translate, scale] = getImageTransform(size, layout);
+  const [translate, scale] = getImageTransform(size, {
+    width: windowSize.width,
+    height: windowSize.height,
+  });
   const scrollValueY = new Animated.Value(0);
 
   const onLoaded = useCallback((e: ImageLoadEventData) => {
@@ -100,7 +102,6 @@ const ImageItem = ({
     delayLongPress,
     onPress: onPressHandler,
     doubleTapDelay,
-    layout,
   });
 
   const imagesStyles = getImageStyles(size, translateValue, scaleValue);
@@ -119,7 +120,7 @@ const ImageItem = ({
     if (
       (Math.abs(velocityY) > SWIPE_CLOSE_VELOCITY &&
         offsetY > SWIPE_CLOSE_OFFSET) ||
-      offsetY > layout.height / 2
+      offsetY > windowSize.height / 2
     ) {
       onRequestClose();
     }
@@ -133,24 +134,16 @@ const ImageItem = ({
     scrollValueY.setValue(offsetY);
   };
 
-  const layoutStyle = React.useMemo(
-    () => ({
-      width: layout.width,
-      height: layout.height,
-    }),
-    [layout]
-  );
-
   return (
     <ScrollView
       ref={imageContainer}
-      style={layoutStyle}
+      style={{ width: windowSize.width, height: windowSize.height }}
       pagingEnabled
       nestedScrollEnabled
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
-        height: layout.height,
+        height: windowSize.height * 2,
       }}
       scrollEnabled={swipeToCloseEnabled}
       {...(swipeToCloseEnabled && {
@@ -165,7 +158,7 @@ const ImageItem = ({
         onLoad={onLoaded}
         style={imageStylesWithOpacity}
       />
-      {!isLoaded && <ImageLoading style={layoutStyle} />}
+      {!isLoaded && <ImageLoading />}
     </ScrollView>
   );
 };

@@ -6,7 +6,7 @@
  *
  */
 import { ImageProps } from 'expo-image';
-import { ImageSource, Dimensions } from '../../@types';
+import { ImageSource } from '../../@types';
 type Props = {
     imageSrc: ImageSource;
     onRequestClose: () => void;
@@ -18,7 +18,10 @@ type Props = {
     onPress: (image: ImageSource) => void;
     doubleTapDelay: number;
     imageProps?: ImageProps;
-    layout: Dimensions;
+    windowSize: {
+        width: number;
+        height: number;
+    };
 };
-declare const ImageItem: ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled, doubleTapToZoomEnabled, onPress, doubleTapDelay, imageProps, layout, }: Props) => JSX.Element;
+declare const ImageItem: ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled, doubleTapToZoomEnabled, onPress, doubleTapDelay, imageProps, windowSize, }: Props) => JSX.Element;
 export default ImageItem;

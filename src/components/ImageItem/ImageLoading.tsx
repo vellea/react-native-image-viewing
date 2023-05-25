@@ -7,24 +7,22 @@
  */
 
 import React, { memo } from 'react';
-
 import {
   ActivityIndicator,
-  StyleProp,
   StyleSheet,
+  useWindowDimensions,
   View,
-  ViewStyle,
 } from 'react-native';
 
-type ImageLoadingProps = {
-  style?: StyleProp<ViewStyle>;
-};
+const ImageLoading = () => {
+  const { width, height } = useWindowDimensions();
 
-const ImageLoading = ({ style }: ImageLoadingProps) => (
-  <View style={[style, styles.loading]}>
-    <ActivityIndicator size="small" color="#FFF" />
-  </View>
-);
+  return (
+    <View style={[{ width, height }, styles.loading]}>
+      <ActivityIndicator size="small" color="#FFF" />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   loading: {
