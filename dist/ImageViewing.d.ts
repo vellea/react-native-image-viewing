@@ -9,6 +9,7 @@ import { ImageProps } from 'expo-image';
 import { ComponentType } from 'react';
 import { ModalProps } from 'react-native';
 import { ImageSource } from './@types';
+type Orientations = 'portrait' | 'portrait-upside-down' | 'landscape' | 'landscape-left' | 'landscape-right';
 type Props = {
     images: ImageSource[];
     keyExtractor?: (imageSrc: ImageSource, index: number) => string;
@@ -35,6 +36,7 @@ type Props = {
     blurRadius?: number;
     blurOverlayColor?: string;
     imageProps?: ImageProps;
+    supportedOrientations?: Orientations[];
 };
 declare const EnhancedImageViewing: (props: Props) => JSX.Element;
 export default EnhancedImageViewing;

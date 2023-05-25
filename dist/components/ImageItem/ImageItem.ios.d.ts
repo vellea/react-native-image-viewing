@@ -6,7 +6,6 @@
  *
  */
 import { ImageProps } from 'expo-image';
-import React from 'react';
 import { ImageSource } from '../../@types';
 type Props = {
     imageSrc: ImageSource;
@@ -19,6 +18,10 @@ type Props = {
     onPress: (image: ImageSource) => void;
     doubleTapDelay: number;
     imageProps?: ImageProps;
+    windowSize: {
+        width: number;
+        height: number;
+    };
 };
-declare const _default: React.MemoExoticComponent<({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled, doubleTapToZoomEnabled, onPress, doubleTapDelay, imageProps, }: Props) => JSX.Element>;
-export default _default;
+declare const ImageItem: ({ imageSrc, onZoom, onRequestClose, onLongPress, delayLongPress, swipeToCloseEnabled, doubleTapToZoomEnabled, onPress, doubleTapDelay, imageProps, windowSize, }: Props) => JSX.Element;
+export default ImageItem;
