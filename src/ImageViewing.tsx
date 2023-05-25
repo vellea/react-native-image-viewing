@@ -118,7 +118,6 @@ function ImageViewing({
   // Set default index when visible change
   useEffect(() => {
     if (visible) {
-      console.log('[ImageViewing] useEffect visible');
       setCurrentIndex(imageIndex);
     }
   }, [visible, imageIndex]);
@@ -126,7 +125,6 @@ function ImageViewing({
   // When windowWidth change, reset list to currentIndex
   useEffect(() => {
     if (imageList.current) {
-      console.log('[ImageViewing] useEffect startRotation');
       startRotation(() => {
         // @ts-ignore
         imageList.current?.scrollToIndex({
@@ -138,7 +136,6 @@ function ImageViewing({
   }, [windowWidth, imageList]);
 
   useEffect(() => {
-    console.log('[ImageViewing] useEffect onImageIndexChange');
     onImageIndexChange?.(currentIndex);
   }, [onImageIndexChange, currentIndex]);
 

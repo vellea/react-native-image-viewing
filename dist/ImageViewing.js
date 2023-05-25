@@ -34,14 +34,12 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
     // Set default index when visible change
     useEffect(() => {
         if (visible) {
-            console.log('[ImageViewing] useEffect visible');
             setCurrentIndex(imageIndex);
         }
     }, [visible, imageIndex]);
     // When windowWidth change, reset list to currentIndex
     useEffect(() => {
         if (imageList.current) {
-            console.log('[ImageViewing] useEffect startRotation');
             startRotation(() => {
                 var _a;
                 // @ts-ignore
@@ -53,7 +51,6 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
         }
     }, [windowWidth, imageList]);
     useEffect(() => {
-        console.log('[ImageViewing] useEffect onImageIndexChange');
         onImageIndexChange === null || onImageIndexChange === void 0 ? void 0 : onImageIndexChange(currentIndex);
     }, [onImageIndexChange, currentIndex]);
     if (!visible) {
