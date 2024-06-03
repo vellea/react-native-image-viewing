@@ -20,10 +20,9 @@ import {
   Modal,
   ModalProps,
   StyleSheet,
-  useWindowDimensions,
   View,
-  ViewToken,
   VirtualizedList,
+  useWindowDimensions
 } from 'react-native';
 
 import { ImageSource } from './@types';
@@ -39,6 +38,14 @@ type Orientations =
   | 'landscape'
   | 'landscape-left'
   | 'landscape-right';
+
+type ViewToken  = {
+  item: any;
+  key: string;
+  index: number | null;
+  isViewable: boolean;
+  section?: any;
+}
 
 type Props = {
   images: ImageSource[];
@@ -139,6 +146,18 @@ function ImageViewing({
     onImageIndexChange?.(currentIndex);
   }, [onImageIndexChange, currentIndex]);
 
+  const onViewableItemsChanged = useCallback(({ viewableItems, changed }:{viewableItems:ViewToken[], changed:ViewToken[] }) => {
+    if (isRotating) return;
+    const index = viewableItems[viewableItems.length - 1].index
+    setCurrentIndex(index)
+  }, []);
+
+  const viewabilityConfigCallbackPairs = useRef([
+    {
+      onViewableItemsChanged
+    },
+  ]);
+
   if (!visible) {
     return null;
   }
@@ -222,21 +241,9 @@ function ImageViewing({
           viewabilityConfig={{
             itemVisiblePercentThreshold: 100,
           }}
-          onViewableItemsChanged={({
-            changed,
-            viewableItems,
-          }: {
-            changed: ViewToken[];
-            viewableItems: ViewToken[];
-          }) => {
-            if (isRotating) return;
-
-            if (changed[0].index === 1 && viewableItems.length === 0) {
-              setCurrentIndex(0);
-            } else if (viewableItems.length > 0 && viewableItems[0].index) {
-              setCurrentIndex(viewableItems[0].index);
-            }
-          }}
+          viewabilityConfigCallbackPairs={
+            viewabilityConfigCallbackPairs.current
+        }
           keyExtractor={(imageSrc: ImageSource, index: number) =>
             keyExtractor?.(imageSrc, index) ?? typeof imageSrc === 'number'
               ? imageSrc.toString()
