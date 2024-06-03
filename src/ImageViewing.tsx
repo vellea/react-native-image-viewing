@@ -20,14 +20,9 @@ import {
   Modal,
   ModalProps,
   StyleSheet,
-  useWindowDimensions,
   View,
-  ViewToken,
   VirtualizedList,
-<<<<<<< Updated upstream
-=======
   useWindowDimensions,
->>>>>>> Stashed changes
 } from 'react-native';
 
 import { ImageSource } from './@types';
@@ -44,17 +39,15 @@ type Orientations =
   | 'landscape-left'
   | 'landscape-right';
 
-<<<<<<< Updated upstream
-=======
-type ViewToken = {
+
+type ViewToken  = {
   item: any;
   key: string;
   index: number | null;
   isViewable: boolean;
   section?: any;
-};
+}
 
->>>>>>> Stashed changes
 type Props = {
   images: ImageSource[];
   keyExtractor?: (imageSrc: ImageSource, index: number) => string;
@@ -154,8 +147,7 @@ function ImageViewing({
     onImageIndexChange?.(currentIndex);
   }, [onImageIndexChange, currentIndex]);
 
-<<<<<<< Updated upstream
-=======
+
   const onViewableItemsChanged = useCallback(
     ({
       viewableItems,
@@ -177,7 +169,6 @@ function ImageViewing({
     },
   ]);
 
->>>>>>> Stashed changes
   if (!visible) {
     return null;
   }
@@ -261,27 +252,9 @@ function ImageViewing({
           viewabilityConfig={{
             itemVisiblePercentThreshold: 100,
           }}
-<<<<<<< Updated upstream
-          onViewableItemsChanged={({
-            changed,
-            viewableItems,
-          }: {
-            changed: ViewToken[];
-            viewableItems: ViewToken[];
-          }) => {
-            if (isRotating) return;
-
-            if (changed[0].index === 1 && viewableItems.length === 0) {
-              setCurrentIndex(0);
-            } else if (viewableItems.length > 0 && viewableItems[0].index) {
-              setCurrentIndex(viewableItems[0].index);
-            }
-          }}
-=======
           viewabilityConfigCallbackPairs={
             viewabilityConfigCallbackPairs.current
-          }
->>>>>>> Stashed changes
+        }
           keyExtractor={(imageSrc: ImageSource, index: number) =>
             keyExtractor?.(imageSrc, index) ?? typeof imageSrc === 'number'
               ? imageSrc.toString()
