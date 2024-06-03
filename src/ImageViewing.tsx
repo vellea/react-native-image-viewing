@@ -24,6 +24,10 @@ import {
   View,
   ViewToken,
   VirtualizedList,
+<<<<<<< Updated upstream
+=======
+  useWindowDimensions,
+>>>>>>> Stashed changes
 } from 'react-native';
 
 import { ImageSource } from './@types';
@@ -40,6 +44,17 @@ type Orientations =
   | 'landscape-left'
   | 'landscape-right';
 
+<<<<<<< Updated upstream
+=======
+type ViewToken = {
+  item: any;
+  key: string;
+  index: number | null;
+  isViewable: boolean;
+  section?: any;
+};
+
+>>>>>>> Stashed changes
 type Props = {
   images: ImageSource[];
   keyExtractor?: (imageSrc: ImageSource, index: number) => string;
@@ -139,6 +154,30 @@ function ImageViewing({
     onImageIndexChange?.(currentIndex);
   }, [onImageIndexChange, currentIndex]);
 
+<<<<<<< Updated upstream
+=======
+  const onViewableItemsChanged = useCallback(
+    ({
+      viewableItems,
+      changed,
+    }: {
+      viewableItems: ViewToken[];
+      changed: ViewToken[];
+    }) => {
+      if (isRotating) return;
+      const index = viewableItems[viewableItems.length - 1].index || 0;
+      setCurrentIndex(index);
+    },
+    []
+  );
+
+  const viewabilityConfigCallbackPairs = useRef([
+    {
+      onViewableItemsChanged,
+    },
+  ]);
+
+>>>>>>> Stashed changes
   if (!visible) {
     return null;
   }
@@ -222,6 +261,7 @@ function ImageViewing({
           viewabilityConfig={{
             itemVisiblePercentThreshold: 100,
           }}
+<<<<<<< Updated upstream
           onViewableItemsChanged={({
             changed,
             viewableItems,
@@ -237,6 +277,11 @@ function ImageViewing({
               setCurrentIndex(viewableItems[0].index);
             }
           }}
+=======
+          viewabilityConfigCallbackPairs={
+            viewabilityConfigCallbackPairs.current
+          }
+>>>>>>> Stashed changes
           keyExtractor={(imageSrc: ImageSource, index: number) =>
             keyExtractor?.(imageSrc, index) ?? typeof imageSrc === 'number'
               ? imageSrc.toString()

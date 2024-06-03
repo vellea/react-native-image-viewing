@@ -7,7 +7,7 @@
  */
 import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState, useTransition, } from 'react';
-import { Animated, Modal, StyleSheet, useWindowDimensions, View, VirtualizedList, } from 'react-native';
+import { Animated, Modal, StyleSheet, View, VirtualizedList, useWindowDimensions, } from 'react-native';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';
@@ -53,6 +53,17 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
     useEffect(() => {
         onImageIndexChange === null || onImageIndexChange === void 0 ? void 0 : onImageIndexChange(currentIndex);
     }, [onImageIndexChange, currentIndex]);
+    const onViewableItemsChanged = useCallback(({ viewableItems, changed, }) => {
+        if (isRotating)
+            return;
+        const index = viewableItems[viewableItems.length - 1].index || 0;
+        setCurrentIndex(index);
+    }, []);
+    const viewabilityConfigCallbackPairs = useRef([
+        {
+            onViewableItemsChanged,
+        },
+    ]);
     if (!visible) {
         return null;
     }
@@ -81,16 +92,7 @@ function ImageViewing({ images, keyExtractor, imageIndex, visible, onRequestClos
               </>);
         }} viewabilityConfig={{
             itemVisiblePercentThreshold: 100,
-        }} onViewableItemsChanged={({ changed, viewableItems, }) => {
-            if (isRotating)
-                return;
-            if (changed[0].index === 1 && viewableItems.length === 0) {
-                setCurrentIndex(0);
-            }
-            else if (viewableItems.length > 0 && viewableItems[0].index) {
-                setCurrentIndex(viewableItems[0].index);
-            }
-        }} keyExtractor={(imageSrc, index) => {
+        }} viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current} keyExtractor={(imageSrc, index) => {
             var _a, _b;
             return ((_a = keyExtractor === null || keyExtractor === void 0 ? void 0 : keyExtractor(imageSrc, index)) !== null && _a !== void 0 ? _a : typeof imageSrc === 'number')
                 ? imageSrc.toString()
