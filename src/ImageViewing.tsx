@@ -22,7 +22,7 @@ import {
   StyleSheet,
   View,
   VirtualizedList,
-  useWindowDimensions
+  useWindowDimensions,
 } from 'react-native';
 
 import { ImageSource } from './@types';
@@ -38,6 +38,7 @@ type Orientations =
   | 'landscape'
   | 'landscape-left'
   | 'landscape-right';
+
 
 type ViewToken  = {
   item: any;
@@ -146,15 +147,25 @@ function ImageViewing({
     onImageIndexChange?.(currentIndex);
   }, [onImageIndexChange, currentIndex]);
 
-  const onViewableItemsChanged = useCallback(({ viewableItems, changed }:{viewableItems:ViewToken[], changed:ViewToken[] }) => {
-    if (isRotating) return;
-    const index = viewableItems[viewableItems.length - 1].index
-    setCurrentIndex(index)
-  }, []);
+
+  const onViewableItemsChanged = useCallback(
+    ({
+      viewableItems,
+      changed,
+    }: {
+      viewableItems: ViewToken[];
+      changed: ViewToken[];
+    }) => {
+      if (isRotating) return;
+      const index = viewableItems[viewableItems.length - 1].index || 0;
+      setCurrentIndex(index);
+    },
+    []
+  );
 
   const viewabilityConfigCallbackPairs = useRef([
     {
-      onViewableItemsChanged
+      onViewableItemsChanged,
     },
   ]);
 
