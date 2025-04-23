@@ -6,7 +6,6 @@
  *
  */
 
-import { Image, ImageLoadEventData, ImageProps } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -14,6 +13,7 @@ import {
   NativeSyntheticEvent,
   ScrollView,
   TouchableWithoutFeedback,
+  Image, ImageLoadEventData, ImageProps
 } from 'react-native';
 
 import { ImageSource } from '../../@types';
@@ -122,12 +122,10 @@ const ImageItem = ({
     onLongPress(imageSrc);
   }, [imageSrc, onLongPress]);
 
-  const onLoaded = useCallback((e: ImageLoadEventData) => {
-    setSize({
-      width: e.source.width,
-      height: e.source.height,
-    });
+  const onLoaded = useCallback((e: NativeSyntheticEvent<ImageLoadEventData>) => {
+    const { width, height } = e.nativeEvent.source;
 
+    setSize({ width, height });
     setLoaded(true);
   }, []);
 

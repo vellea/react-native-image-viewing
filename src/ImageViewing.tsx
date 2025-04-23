@@ -6,7 +6,6 @@
  *
  */
 
-import { Image, ImageProps } from 'expo-image';
 import React, {
   ComponentType,
   useCallback,
@@ -23,6 +22,7 @@ import {
   View,
   VirtualizedList,
   useWindowDimensions,
+  Image, ImageProps
 } from 'react-native';
 
 import { ImageSource } from './@types';

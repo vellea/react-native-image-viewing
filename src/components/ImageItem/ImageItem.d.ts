@@ -6,7 +6,7 @@
  *
  */
 
-import { ImageProps } from 'expo-image';
+import { ImageProps } from 'react-native';
 import React from 'react';
 
 import { ImageSource } from '../../@types';
