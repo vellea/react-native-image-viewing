@@ -5,9 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { ImageProps } from 'expo-image';
 import { ComponentType } from 'react';
-import { ModalProps } from 'react-native';
+import { ModalProps, ImageProps } from 'react-native';
 import { ImageSource } from './@types';
 type Orientations = 'portrait' | 'portrait-upside-down' | 'landscape' | 'landscape-left' | 'landscape-right';
 type Props = {

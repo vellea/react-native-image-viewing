@@ -5,9 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { Image } from 'expo-image';
 import React, { useCallback, useEffect, useRef, useState, useTransition, } from 'react';
-import { Animated, Modal, StyleSheet, View, VirtualizedList, useWindowDimensions, } from 'react-native';
+import { Animated, Modal, StyleSheet, View, VirtualizedList, useWindowDimensions, Image } from 'react-native';
 import ImageDefaultHeader from './components/ImageDefaultHeader';
 import ImageItem from './components/ImageItem/ImageItem';
 import StatusBarManager from './components/StatusBarManager';

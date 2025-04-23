@@ -5737,16 +5737,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-image-viewing@github:vellea/react-native-image-viewing":
-  version: 0.2.2
-  resolution: "react-native-image-viewing@https://github.com/vellea/react-native-image-viewing.git#commit=df6f3a57893b9626f617abb0ea9904b774c182a7"
-  peerDependencies:
-    react: ">=16.11.0"
-    react-native: ">=0.61.3"
-  checksum: 0c8f6e4b79a08b9d046fbf023d66840603407b5c0ffedd1061f8d9808bc06f3b5e7587b98b14b2fc5fc205a6714c0e959961f83c5985f027ca4cfd0278211357
-  languageName: node
-  linkType: hard
-
 "react-native-image-viewing@workspace:.":
   version: 0.0.0-use.local
   resolution: "react-native-image-viewing@workspace:."
@@ -5757,7 +5747,6 @@ __metadata:
     prettier: ^2.8.4
     react: 18.2.0
     react-native: 0.71.3
-    react-native-image-viewing: "github:vellea/react-native-image-viewing"
     typescript: 4.9.5
   peerDependencies:
     react: ">=16.11.0"
